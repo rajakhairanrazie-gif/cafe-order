@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login - To Where Coffee{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>TO WHERE</h1>
+    <p>COFFEE</p>
+</div>
+
+<div class="container" style="max-width: 360px;">
+    <h2 style="margin-bottom: 16px; text-align:center;">Login</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p style="color: var(--cafe-terracotta); text-align:center; font-size:13px; margin-bottom:12px;">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div style="margin-bottom: 12px;">
+            <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Email</label>
+            <input type="email" name="email" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Password</label>
+            <input type="password" name="password" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        </div>
+
+        <button type="submit" class="btn-primary">Masuk</button>
+    </form>
+</div>
+{% endblock %}

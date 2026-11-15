@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Kode Pesanan - To Where Coffee{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>TO WHERE</h1>
+    <p>COFFEE</p>
+</div>
+
+<div class="container" style="text-align:center;">
+    <p style="color: var(--cafe-wood-mid); margin-bottom: 6px;">Pesanan diterima</p>
+    <p style="font-weight:500; margin-bottom: 16px;">Sebutkan kode ini ke kasir</p>
+
+    <div style="background: var(--cafe-card); border-radius:12px; padding:24px; margin-bottom:16px;">
+        <div style="font-size:40px; font-weight:500; color: var(--cafe-wood-dark);">#{{ order.daily_number }}</div>
+        <div style="font-size:12px; color: var(--cafe-wood-mid); margin-top:4px;">Kode pesanan hari ini</div>
+    </div>
+
+    <p style="font-size:12px; color: var(--cafe-wood-mid);">Bayar tunai, QRIS, atau debit di kasir</p>
+</div>
+{% endblock %}

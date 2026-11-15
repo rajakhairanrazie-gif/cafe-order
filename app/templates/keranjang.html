@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Keranjang - To Where Coffee{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>TO WHERE</h1>
+    <p>COFFEE</p>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 12px;">Keranjang</h2>
+
+    {% if items %}
+        {% for item in items %}
+        <div class="menu-item">
+            <div class="menu-item-info">
+                <div class="menu-item-name">{{ item.variant.product.name }} - {{ item.variant.variant_name }}</div>
+                <div class="menu-item-price">x{{ item.quantity }} = Rp{{ "{:,.0f}".format(item.subtotal) }}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <a href="{{ url_for('main.ubah_keranjang', index=item.index, aksi='kurang') }}" style="width:26px; height:26px; border-radius:50%; background:var(--cafe-wood-mid); color:var(--cafe-bg); display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:16px;">-</a>
+                <span style="min-width:16px; text-align:center;">{{ item.quantity }}</span>
+                <a href="{{ url_for('main.ubah_keranjang', index=item.index, aksi='tambah') }}" style="width:26px; height:26px; border-radius:50%; background:var(--cafe-wood-dark); color:var(--cafe-bg); display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:16px;">+</a>
+                <a href="{{ url_for('main.ubah_keranjang', index=item.index, aksi='hapus') }}" style="margin-left:6px; color:var(--cafe-terracotta); text-decoration:none; font-size:16px;">✕</a>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="display:flex; justify-content:space-between; margin-top:16px; font-weight:500;">
+            <span>Total</span>
+            <span>Rp{{ "{:,.0f}".format(total) }}</span>
+        </div>
+
+        <form method="POST" action="{{ url_for('main.checkout') }}">
+            <button type="submit" class="btn-primary">Pesan sekarang</button>
+        </form>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center; margin-top: 40px;">Keranjang masih kosong.</p>
+    {% endif %}
+
+    <a href="{{ url_for('main.menu') }}" style="display:block; text-align:center; margin-top:12px; color: var(--cafe-wood-mid); font-size:13px;">Kembali ke menu</a>
+</div>
+{% endblock %}

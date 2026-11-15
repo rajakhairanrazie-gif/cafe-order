@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.daily_number }}{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Order #{{ order.daily_number }}</h1>
+    <p>{{ 'Online' if order.type == 'online' else 'Offline' }}</p>
+</div>
+
+<div class="container">
+    {% for item in order.items %}
+    <div class="menu-item">
+        <div class="menu-item-info">
+            <div class="menu-item-name">{{ item.variant.product.name }} - {{ item.variant.variant_name }}</div>
+            <div class="menu-item-price">x{{ item.quantity }} = Rp{{ "{:,.0f}".format(item.price_at_order * item.quantity) }}</div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div style="display:flex; justify-content:space-between; margin-top:16px; font-weight:500;">
+        <span>Total</span>
+        <span>Rp{{ "{:,.0f}".format(total) }}</span>
+    </div>
+
+    <a href="{{ url_for('kasir.bayar_order', order_id=order.id) }}" class="btn-primary" style="text-decoration:none; display:block; text-align:center;">Bayar sekarang</a>
+
+    <a href="{{ url_for('kasir.dashboard') }}" style="display:block; text-align:center; margin-top:12px; color: var(--cafe-wood-mid); font-size:13px;">Kembali</a>
+</div>
+{% endblock %}

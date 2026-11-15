@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Menu - To Where Coffee{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>TO WHERE</h1>
+    <p>COFFEE</p>
+</div>
+
+<div class="container">
+    <div class="categories">
+        <div class="category-pill active">Semua</div>
+        {% for category in categories %}
+        <div class="category-pill">{{ category.name }}</div>
+        {% endfor %}
+    </div>
+
+    {% for product in products %}
+    <div class="menu-item">
+        <div class="menu-item-img">☕</div>
+        <div class="menu-item-info">
+            <div class="menu-item-name">{{ product.name }}</div>
+            <div class="menu-item-price">Rp{{ "{:,.0f}".format(product.variants[0].price) }}</div>
+        </div>
+        <a href="{{ url_for('main.detail_produk', product_id=product.id) }}" class="menu-item-add" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">+</a>
+    </div>
+    {% endfor %}
+
+    <a href="{{ url_for('main.keranjang') }}" class="btn-primary" style="text-decoration:none; display:block;">Lihat keranjang ({{ cart_count }})</a>
+</div>
+{% endblock %}

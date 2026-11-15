@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - To Where Coffee{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>TO WHERE</h1>
+    <p>COFFEE</p>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 4px;">{{ product.name }}</h2>
+
+    <form method="POST" action="{{ url_for('main.tambah_keranjang') }}">
+        <div style="margin: 16px 0;">
+            <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Pilih varian</label>
+            <select name="variant_id" style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+                {% for variant in product.variants %}
+                <option value="{{ variant.id }}">{{ variant.variant_name }} - Rp{{ "{:,.0f}".format(variant.price) }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin: 16px 0;">
+            <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Jumlah</label>
+            <input type="number" name="quantity" value="1" min="1" style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        </div>
+
+        <button type="submit" class="btn-primary">Tambah ke keranjang</button>
+    </form>
+</div>
+{% endblock %}

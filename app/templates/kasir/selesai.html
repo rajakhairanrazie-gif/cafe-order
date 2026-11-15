@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Pembayaran Selesai{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Pembayaran Selesai</h1>
+</div>
+
+<div class="container" style="text-align:center;">
+    <p style="font-weight:500; margin: 16px 0;">Pembayaran berhasil</p>
+    <div style="background: var(--cafe-card); border-radius:12px; padding:16px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span>Total dibayar</span>
+            <span>Rp{{ "{:,.0f}".format(payment.total_amount) }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <span>Metode</span>
+            <span>{{ payment.method|capitalize }}</span>
+        </div>
+    </div>
+
+    <a href="{{ url_for('kasir.dashboard') }}" class="btn-primary" style="text-decoration:none; display:block;">Kembali ke dashboard</a>
+</div>
+{% endblock %}

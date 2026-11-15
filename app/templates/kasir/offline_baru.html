@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Pesanan Offline{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Pesanan offline baru</h1>
+</div>
+
+<div class="container">
+    {% for product in products %}
+    <div class="menu-item">
+        <div class="menu-item-info">
+            <div class="menu-item-name">{{ product.name }}</div>
+            <div class="menu-item-price">Rp{{ "{:,.0f}".format(product.variants[0].price) }}</div>
+        </div>
+        <form method="POST" action="{{ url_for('kasir.offline_tambah') }}">
+            <input type="hidden" name="variant_id" value="{{ product.variants[0].id }}">
+            <button type="submit" class="menu-item-add" style="border:none;">+</button>
+        </form>
+    </div>
+    {% endfor %}
+
+    <a href="{{ url_for('kasir.offline_keranjang') }}" class="btn-primary" style="text-decoration:none; display:block; text-align:center;">Lihat keranjang ({{ cart_count }})</a>
+    <a href="{{ url_for('kasir.dashboard') }}" style="display:block; text-align:center; margin-top:12px; color: var(--cafe-wood-mid); font-size:13px;">Kembali</a>
+</div>
+{% endblock %}
