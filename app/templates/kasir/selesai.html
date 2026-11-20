@@ -11,6 +11,10 @@
     <p style="font-weight:500; margin: 16px 0;">Pembayaran berhasil</p>
     <div style="background: var(--cafe-card); border-radius:12px; padding:16px; margin-bottom:16px;">
         <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span>Order</span>
+            <span>{% for lo in payment.linked_orders %}#{{ lo.order.daily_number }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
             <span>Total dibayar</span>
             <span>Rp{{ "{:,.0f}".format(payment.total_amount) }}</span>
         </div>

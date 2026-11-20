@@ -142,3 +142,59 @@ def offline_simpan(aksi):
         return redirect(url_for('kasir.bayar_order', order_id=order.id))
     else:
         return redirect(url_for('kasir.dashboard'))
+
+@kasir.route('/gabung')
+@login_required
+def gabung():
+    orders = Order.query.filter_by(status='open').order_by(Order.id.desc()).all()
+    data = []
+    for order in orders:
+        total = sum(float(item.price_at_order) * item.quantity for item in order.items)
+        data.append({'order': order, 'total': total})
+    return render_template('kasir/gabung.html', data=data)
+
+
+@kasir.route('/gabung/konfirmasi', methods=['POST'])
+@login_required
+def gabung_konfirmasi():
+    order_ids = request.form.getlist('order_ids', type=int)
+    if not order_ids:
+        flash('Pilih minimal 1 order')
+        return redirect(url_for('kasir.gabung'))
+
+    orders = Order.query.filter(Order.id.in_(order_ids), Order.status == 'open').all()
+    data = []
+    grand_total = 0
+    for order in orders:
+        total = sum(float(item.price_at_order) * item.quantity for item in order.items)
+        grand_total += total
+        data.append({'order': order, 'total': total})
+
+    return render_template('kasir/gabung_bayar.html', data=data, grand_total=grand_total)
+
+
+@kasir.route('/gabung/proses', methods=['POST'])
+@login_required
+def gabung_proses():
+    order_ids = request.form.getlist('order_ids', type=int)
+    method = request.form['method']
+
+    orders = Order.query.filter(Order.id.in_(order_ids), Order.status == 'open').all()
+    if not orders:
+        return redirect(url_for('kasir.dashboard'))
+
+    grand_total = sum(
+        float(item.price_at_order) * item.quantity
+        for order in orders for item in order.items
+    )
+
+    payment = Payment(cashier_id=current_user.id, method=method, total_amount=grand_total, paid_at=datetime.now())
+    db.session.add(payment)
+    db.session.flush()
+
+    for order in orders:
+        db.session.add(PaymentOrder(payment_id=payment.id, order_id=order.id))
+        order.status = 'paid'
+
+    db.session.commit()
+    return redirect(url_for('kasir.pembayaran_selesai', payment_id=payment.id))

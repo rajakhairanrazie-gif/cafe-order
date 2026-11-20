@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Pembayaran Gabungan{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Pembayaran gabungan</h1>
+    <p>{{ data|length }} order digabung</p>
+</div>
+
+<div class="container">
+    {% for row in data %}
+    <div class="menu-item">
+        <div class="menu-item-info">
+            <div class="menu-item-name">#{{ row.order.daily_number }}</div>
+            <div class="menu-item-price">
+                {% for item in row.order.items %}{{ item.variant.product.name }} x{{ item.quantity }}{% if not loop.last %}, {% endif %}{% endfor %}
+            </div>
+        </div>
+        <div style="font-weight:500;">Rp{{ "{:,.0f}".format(row.total) }}</div>
+    </div>
+    {% endfor %}
+
+    <div style="background: var(--cafe-card); border-radius:12px; padding:16px; margin:16px 0;">
+        <div style="display:flex; justify-content:space-between; font-weight:500;">
+            <span>Total gabungan</span>
+            <span>Rp{{ "{:,.0f}".format(grand_total) }}</span>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('kasir.gabung_proses') }}">
+        {% for row in data %}
+        <input type="hidden" name="order_ids" value="{{ row.order.id }}">
+        {% endfor %}
+
+        <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:8px;">Metode pembayaran</label>
+        <div style="display:flex; gap:8px; margin-bottom:16px;">
+            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
+                <input type="radio" name="method" value="tunai" checked style="margin-right:4px;">Tunai
+            </label>
+            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
+                <input type="radio" name="method" value="qris" style="margin-right:4px;">QRIS
+            </label>
+            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
+                <input type="radio" name="method" value="debit" style="margin-right:4px;">Debit
+            </label>
+        </div>
+
+        <button type="submit" class="btn-primary">Konfirmasi pembayaran</button>
+    </form>
+
+    <a href="{{ url_for('kasir.gabung') }}" style="display:block; text-align:center; margin-top:12px; color: var(--cafe-wood-mid); font-size:13px;">Kembali</a>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Gabung Open Bill{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Gabung open bill</h1>
+    <p>Centang order yang mau dibayar bersamaan</p>
+</div>
+
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p style="color: var(--cafe-terracotta); text-align:center; font-size:13px; margin-bottom:12px;">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    {% if data %}
+    <form method="POST" action="{{ url_for('kasir.gabung_konfirmasi') }}">
+        {% for row in data %}
+        <label class="menu-item" style="cursor:pointer;">
+            <input type="checkbox" name="order_ids" value="{{ row.order.id }}" style="width:18px; height:18px;">
+            <div class="menu-item-info">
+                <div class="menu-item-name">#{{ row.order.daily_number }} · {{ 'Online' if row.order.type == 'online' else 'Offline' }}</div>
+                <div class="menu-item-price">{{ row.order.items|length }} item · Rp{{ "{:,.0f}".format(row.total) }}</div>
+            </div>
+        </label>
+        {% endfor %}
+
+        <button type="submit" class="btn-primary">Lanjut ke pembayaran</button>
+    </form>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center; margin-top:40px;">Tidak ada open bill.</p>
+    {% endif %}
+
+    <a href="{{ url_for('kasir.dashboard') }}" style="display:block; text-align:center; margin-top:12px; color: var(--cafe-wood-mid); font-size:13px;">Kembali</a>
+</div>
+{% endblock %}
