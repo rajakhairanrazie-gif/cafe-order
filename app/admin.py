@@ -291,3 +291,60 @@ def resep_hapus(resep_id):
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for('admin.resep', variant_id=variant_id))
+
+# ---------- Akun ----------
+
+@admin.route('/akun', methods=['GET', 'POST'])
+@login_required
+@admin_only
+def akun():
+    if request.method == 'POST':
+        name = request.form['name'].strip()
+        email = request.form['email'].strip().lower()
+        password = request.form['password']
+        role = request.form['role']
+
+        if not name or not email or len(password) < 6:
+            flash('Nama, email wajib diisi dan password minimal 6 karakter')
+        elif role not in ('admin', 'kasir', 'pajak'):
+            flash('Role tidak valid')
+        elif User.query.filter_by(email=email).first():
+            flash('Email sudah dipakai')
+        else:
+            db.session.add(User(name=name, email=email, role=role,
+                                password=generate_password_hash(password), is_active_account=True))
+            db.session.commit()
+            flash('Akun ditambahkan')
+        return redirect(url_for('admin.akun'))
+
+    users = User.query.order_by(User.id).all()
+    return render_template('admin/akun.html', users=users)
+
+
+@admin.route('/akun/<int:user_id>/status', methods=['POST'])
+@login_required
+@admin_only
+def akun_status(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('Akun yang sedang dipakai tidak bisa dinonaktifkan')
+    else:
+        user.is_active_account = not user.is_active_account
+        db.session.commit()
+        flash('Status akun diubah')
+    return redirect(url_for('admin.akun'))
+
+
+@admin.route('/akun/<int:user_id>/password', methods=['POST'])
+@login_required
+@admin_only
+def akun_password(user_id):
+    user = User.query.get_or_404(user_id)
+    password = request.form['password']
+    if len(password) < 6:
+        flash('Password minimal 6 karakter')
+    else:
+        user.password = generate_password_hash(password)
+        db.session.commit()
+        flash('Password diubah')
+    return redirect(url_for('admin.akun'))

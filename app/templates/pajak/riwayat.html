@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Riwayat Penjualan{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Riwayat penjualan</h1>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'pajak/_nav.html' %}
+
+    {% for row in daftar %}
+    <div class="menu-item">
+        <div class="menu-item-info">
+            <div class="menu-item-name">#{{ row.order.daily_number }} · {{ row.payment.paid_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">{{ row['items']|join(', ') }} · {{ row.payment.method|capitalize }}</div>
+        </div>
+        <div style="font-weight:500;">Rp{{ "{:,.0f}".format(row.total) }}</div>
+    </div>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center;">Belum ada penjualan di periode ini.</p>
+    {% endfor %}
+
+    <div style="display:flex; justify-content:space-between; margin-top:16px; font-weight:500;">
+        <span>Total</span>
+        <span>Rp{{ "{:,.0f}".format(omset) }}</span>
+    </div>
+</div>
+{% endblock %}

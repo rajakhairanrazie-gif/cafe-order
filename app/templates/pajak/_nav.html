@@ -1,0 +1,10 @@
+<div class="categories" style="margin-bottom:12px;">
+    <a href="{{ url_for('pajak.dashboard') }}" class="category-pill" style="text-decoration:none;">Omset</a>
+    <a href="{{ url_for('pajak.riwayat') }}" class="category-pill" style="text-decoration:none;">Riwayat penjualan</a>
+    <a href="{{ url_for('auth.logout') }}" class="category-pill" style="text-decoration:none;">Logout</a>
+</div>
+
+<form method="GET" style="margin-bottom:16px;">
+    <label style="font-size:13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Periode</label>
+    <input type="month" name="bulan" value="{{ bulan }}" onchange="this.form.submit()" style="padding:8px; border-radius:8px; border:1px solid #D8C4A8;">
+</form>

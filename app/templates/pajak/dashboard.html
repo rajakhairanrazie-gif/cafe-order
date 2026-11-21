@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Petugas Pajak{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Omset penjualan</h1>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'pajak/_nav.html' %}
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+        <div class="menu-item" style="display:block; margin:0;">
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">Total omset</div>
+            <div style="font-size:20px; font-weight:500;">Rp{{ "{:,.0f}".format(omset) }}</div>
+        </div>
+        <div class="menu-item" style="display:block; margin:0;">
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">Jumlah transaksi</div>
+            <div style="font-size:20px; font-weight:500;">{{ jumlah }}</div>
+        </div>
+    </div>
+
+    <h3 style="margin-bottom:10px;">Omset per produk</h3>
+    {% for p in produk %}
+    <div class="menu-item">
+        <div class="menu-item-info">
+            <div class="menu-item-name">{{ p.nama }}</div>
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">{{ p.qty }} terjual</div>
+        </div>
+        <div style="font-weight:500;">Rp{{ "{:,.0f}".format(p.total) }}</div>
+    </div>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center;">Belum ada penjualan di periode ini.</p>
+    {% endfor %}
+</div>
+{% endblock %}

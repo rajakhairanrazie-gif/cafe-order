@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Akun{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Kelola akun</h1>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'admin/_nav.html' %}
+
+    <form method="POST" style="background: var(--cafe-card); border-radius:12px; padding:12px; margin-bottom:16px;">
+        <div style="font-size:13px; color: var(--cafe-wood-mid); margin-bottom:8px;">Tambah akun baru</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input type="text" name="name" placeholder="Nama" required style="flex:1; min-width:120px; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <input type="email" name="email" placeholder="Email" required style="flex:1; min-width:160px; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <input type="password" name="password" placeholder="Password" minlength="6" required style="flex:1; min-width:120px; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <select name="role" style="padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+                <option value="kasir">Kasir</option>
+                <option value="pajak">Petugas pajak</option>
+                <option value="admin">Admin</option>
+            </select>
+            <button type="submit" class="btn-primary" style="width:auto; margin-top:0; padding:10px 16px;">Tambah</button>
+        </div>
+    </form>
+
+    {% for u in users %}
+    <div class="menu-item" style="display:block;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div class="menu-item-name">{{ u.name }}</div>
+                <div style="font-size:12px; color: var(--cafe-wood-mid);">{{ u.email }} · {{ u.role|capitalize }}</div>
+            </div>
+            <form method="POST" action="{{ url_for('admin.akun_status', user_id=u.id) }}">
+                <button type="submit" style="border:none; background:none; cursor:pointer; font-size:13px; color: {{ 'var(--cafe-wood-mid)' if u.is_active_account else 'var(--cafe-terracotta)' }};">
+                    {{ 'Aktif (klik untuk nonaktifkan)' if u.is_active_account else 'Nonaktif (klik untuk aktifkan)' }}
+                </button>
+            </form>
+        </div>
+        <form method="POST" action="{{ url_for('admin.akun_password', user_id=u.id) }}" style="display:flex; gap:6px; margin-top:8px;">
+            <input type="password" name="password" placeholder="Password baru" minlength="6" required style="flex:1; padding:6px; border-radius:8px; border:1px solid #D8C4A8;">
+            <button type="submit" style="padding:6px 10px; border-radius:8px; border:1px solid var(--cafe-wood-mid); background:transparent; color: var(--cafe-wood-mid); cursor:pointer;">Ganti password</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
