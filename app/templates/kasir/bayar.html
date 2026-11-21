@@ -9,6 +9,12 @@
 </div>
 
 <div class="container">
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p style="color: var(--cafe-terracotta); text-align:center; font-size:13px; margin-bottom:12px;">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
     <div style="background: var(--cafe-card); border-radius:12px; padding:16px; margin-bottom:16px;">
         <div style="display:flex; justify-content:space-between; font-weight:500;">
             <span>Total bayar</span>
@@ -17,19 +23,7 @@
     </div>
 
     <form method="POST">
-        <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:8px;">Metode pembayaran</label>
-        <div style="display:flex; gap:8px; margin-bottom:16px;">
-            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
-                <input type="radio" name="method" value="tunai" checked style="margin-right:4px;">Tunai
-            </label>
-            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
-                <input type="radio" name="method" value="qris" style="margin-right:4px;">QRIS
-            </label>
-            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
-                <input type="radio" name="method" value="debit" style="margin-right:4px;">Debit
-            </label>
-        </div>
-
+        {% with jumlah_bayar = total %}{% include 'kasir/_metode_bayar.html' %}{% endwith %}
         <button type="submit" class="btn-primary">Konfirmasi pembayaran</button>
     </form>
 </div>

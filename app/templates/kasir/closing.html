@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Rekap Closing{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Rekap closing</h1>
+    <p>{{ today.strftime('%d %B %Y') }}</p>
+</div>
+
+<div class="container">
+    <div style="background: var(--cafe-card); border-radius:12px; padding:16px; margin-bottom:16px;">
+        {% for nama, data in rekap.items() %}
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #D8C4A8;">
+            <div>
+                <div style="font-weight:500;">{{ nama|capitalize }}</div>
+                <div style="font-size:12px; color: var(--cafe-wood-mid);">{{ data.jumlah }} transaksi</div>
+            </div>
+            <div style="font-weight:500;">Rp{{ "{:,.0f}".format(data.total) }}</div>
+        </div>
+        {% endfor %}
+
+        <div style="display:flex; justify-content:space-between; padding-top:12px; font-weight:500;">
+            <div>
+                <div>Total</div>
+                <div style="font-size:12px; color: var(--cafe-wood-mid); font-weight:400;">{{ grand_count }} transaksi</div>
+            </div>
+            <div style="font-size:18px;">Rp{{ "{:,.0f}".format(grand_total) }}</div>
+        </div>
+    </div>
+
+    <p style="font-size:12px; color: var(--cafe-wood-mid); text-align:center; margin-bottom:12px;">
+        Hitung uang tunai di laci, lalu cocokkan dengan angka Tunai di atas.
+    </p>
+
+    <button onclick="window.print()" class="btn-primary">Cetak rekap closing</button>
+    <a href="{{ url_for('kasir.riwayat') }}" style="display:block; text-align:center; margin-top:12px; color: var(--cafe-wood-mid); font-size:13px;">Kembali ke riwayat</a>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from flask_login import login_required, current_user
 from app.models import Order, OrderItem, Payment, PaymentOrder, Product
 from app import db
@@ -31,13 +31,23 @@ def bayar_order(order_id):
     if request.method == 'POST':
         method = request.form['method']
 
-        payment = Payment(cashier_id=current_user.id, method=method, total_amount=total, paid_at=datetime.now())
+        if method == 'tunai':
+            try:
+                amount_paid = float(request.form.get('amount_paid') or 0)
+            except ValueError:
+                amount_paid = 0
+            if amount_paid < total:
+                flash('Uang diterima kurang dari total')
+                return redirect(url_for('kasir.bayar_order', order_id=order.id))
+        else:
+            amount_paid = total
+
+        payment = Payment(cashier_id=current_user.id, method=method, total_amount=total,
+                          amount_paid=amount_paid, paid_at=datetime.now())
         db.session.add(payment)
         db.session.flush()
 
-        payment_order = PaymentOrder(payment_id=payment.id, order_id=order.id)
-        db.session.add(payment_order)
-
+        db.session.add(PaymentOrder(payment_id=payment.id, order_id=order.id))
         order.status = 'paid'
         db.session.commit()
 
@@ -51,9 +61,6 @@ def bayar_order(order_id):
 def pembayaran_selesai(payment_id):
     payment = Payment.query.get_or_404(payment_id)
     return render_template('kasir/selesai.html', payment=payment)
-
-
-from flask import session
 
 
 @kasir.route('/offline/baru')
@@ -70,7 +77,12 @@ def offline_tambah():
     variant_id = int(request.form['variant_id'])
 
     cart = session.get('kasir_cart', [])
-    cart.append({'variant_id': variant_id, 'quantity': 1})
+    for entry in cart:
+        if entry['variant_id'] == variant_id:
+            entry['quantity'] += 1
+            break
+    else:
+        cart.append({'variant_id': variant_id, 'quantity': 1})
     session['kasir_cart'] = cart
 
     return redirect(url_for('kasir.offline_baru'))
@@ -188,7 +200,19 @@ def gabung_proses():
         for order in orders for item in order.items
     )
 
-    payment = Payment(cashier_id=current_user.id, method=method, total_amount=grand_total, paid_at=datetime.now())
+    if method == 'tunai':
+        try:
+            amount_paid = float(request.form.get('amount_paid') or 0)
+        except ValueError:
+            amount_paid = 0
+        if amount_paid < grand_total:
+            flash('Uang diterima kurang dari total, silakan ulangi')
+            return redirect(url_for('kasir.gabung'))
+    else:
+        amount_paid = grand_total
+
+    payment = Payment(cashier_id=current_user.id, method=method, total_amount=grand_total,
+                      amount_paid=amount_paid, paid_at=datetime.now())
     db.session.add(payment)
     db.session.flush()
 
@@ -198,3 +222,44 @@ def gabung_proses():
 
     db.session.commit()
     return redirect(url_for('kasir.pembayaran_selesai', payment_id=payment.id))
+
+def _rentang_hari_ini():
+    today = datetime.now().date()
+    start = datetime.combine(today, datetime.min.time())
+    end = datetime.combine(today, datetime.max.time())
+    return today, start, end
+
+
+@kasir.route('/riwayat')
+@login_required
+def riwayat():
+    metode = request.args.get('metode', 'semua')
+    today, start, end = _rentang_hari_ini()
+
+    query = Payment.query.filter(Payment.paid_at >= start, Payment.paid_at <= end)
+    if metode in ('tunai', 'qris', 'debit'):
+        query = query.filter_by(method=metode)
+
+    payments = query.order_by(Payment.paid_at.desc()).all()
+    return render_template('kasir/riwayat.html', payments=payments, metode=metode, today=today)
+
+
+@kasir.route('/closing')
+@login_required
+def closing():
+    today, start, end = _rentang_hari_ini()
+    payments = Payment.query.filter(Payment.paid_at >= start, Payment.paid_at <= end).all()
+
+    rekap = {
+        'tunai': {'jumlah': 0, 'total': 0},
+        'qris': {'jumlah': 0, 'total': 0},
+        'debit': {'jumlah': 0, 'total': 0},
+    }
+    for p in payments:
+        rekap[p.method]['jumlah'] += 1
+        rekap[p.method]['total'] += float(p.total_amount)
+
+    grand_total = sum(r['total'] for r in rekap.values())
+    grand_count = sum(r['jumlah'] for r in rekap.values())
+
+    return render_template('kasir/closing.html', rekap=rekap, grand_total=grand_total, grand_count=grand_count, today=today)

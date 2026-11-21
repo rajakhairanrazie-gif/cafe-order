@@ -22,6 +22,16 @@
             <span>Metode</span>
             <span>{{ payment.method|capitalize }}</span>
         </div>
+        {% if payment.method == 'tunai' and payment.amount_paid %}
+        <div style="display:flex; justify-content:space-between; margin-top:6px;">
+            <span>Uang diterima</span>
+            <span>Rp{{ "{:,.0f}".format(payment.amount_paid) }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; font-weight:500;">
+            <span>Kembalian</span>
+            <span>Rp{{ "{:,.0f}".format(payment.amount_paid - payment.total_amount) }}</span>
+        </div>
+        {% endif %}
     </div>
 
     <a href="{{ url_for('kasir.dashboard') }}" class="btn-primary" style="text-decoration:none; display:block;">Kembali ke dashboard</a>

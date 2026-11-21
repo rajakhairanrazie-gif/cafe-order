@@ -1,0 +1,61 @@
+<label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:8px;">Metode pembayaran</label>
+<div style="display:flex; gap:8px; margin-bottom:16px;">
+    <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
+        <input type="radio" name="method" value="tunai" checked style="margin-right:4px;">Tunai
+    </label>
+    <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
+        <input type="radio" name="method" value="qris" style="margin-right:4px;">QRIS
+    </label>
+    <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
+        <input type="radio" name="method" value="debit" style="margin-right:4px;">Debit
+    </label>
+</div>
+
+<div id="kotak-tunai" data-total="{{ jumlah_bayar }}" style="margin-bottom:16px;">
+    <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Uang diterima</label>
+    <div style="display:flex; gap:8px;">
+        <input type="number" id="uang-diterima" name="amount_paid" min="{{ jumlah_bayar }}" step="500" placeholder="0" style="flex:1; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        <button type="button" id="uang-pas" style="padding:10px 14px; border-radius:8px; border:1px solid var(--cafe-wood-mid); background:transparent; color:var(--cafe-wood-mid); cursor:pointer;">Uang pas</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:12px; font-weight:500;">
+        <span>Kembalian</span>
+        <span id="kembalian">Rp0</span>
+    </div>
+</div>
+
+<script>
+(function () {
+    const kotak = document.getElementById('kotak-tunai');
+    const total = parseFloat(kotak.dataset.total);
+    const input = document.getElementById('uang-diterima');
+    const kembalian = document.getElementById('kembalian');
+    const rupiah = n => 'Rp' + Math.round(n).toLocaleString('id-ID');
+
+    function hitung() {
+        const selisih = (parseFloat(input.value) || 0) - total;
+        if (selisih >= 0) {
+            kembalian.textContent = rupiah(selisih);
+            kembalian.style.color = '';
+        } else {
+            kembalian.textContent = 'Kurang ' + rupiah(-selisih);
+            kembalian.style.color = 'var(--cafe-terracotta)';
+        }
+    }
+
+    function ubahMetode() {
+        const tunai = document.querySelector('input[name="method"]:checked').value === 'tunai';
+        kotak.style.display = tunai ? 'block' : 'none';
+        input.required = tunai;
+    }
+
+    input.addEventListener('input', hitung);
+    document.getElementById('uang-pas').addEventListener('click', function () {
+        input.value = total;
+        hitung();
+    });
+    document.querySelectorAll('input[name="method"]').forEach(r => r.addEventListener('change', ubahMetode));
+
+    ubahMetode();
+    hitung();
+})();
+</script>

@@ -9,16 +9,20 @@
 
 <div class="container">
     {% for product in products %}
-    <div class="menu-item">
-        <div class="menu-item-info">
-            <div class="menu-item-name">{{ product.name }}</div>
-            <div class="menu-item-price">Rp{{ "{:,.0f}".format(product.variants[0].price) }}</div>
+        {% for variant in product.variants %}
+        <div class="menu-item">
+            <div class="menu-item-info">
+                <div class="menu-item-name">{{ product.name }} - {{ variant.variant_name }}</div>
+                <div class="menu-item-price">
+                    Rp{{ "{:,.0f}".format(variant.price) }}{% if not product.is_taxable %} · Non-pajak{% endif %}
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('kasir.offline_tambah') }}">
+                <input type="hidden" name="variant_id" value="{{ variant.id }}">
+                <button type="submit" class="menu-item-add" style="border:none;">+</button>
+            </form>
         </div>
-        <form method="POST" action="{{ url_for('kasir.offline_tambah') }}">
-            <input type="hidden" name="variant_id" value="{{ product.variants[0].id }}">
-            <button type="submit" class="menu-item-add" style="border:none;">+</button>
-        </form>
-    </div>
+        {% endfor %}
     {% endfor %}
 
     <a href="{{ url_for('kasir.offline_keranjang') }}" class="btn-primary" style="text-decoration:none; display:block; text-align:center;">Lihat keranjang ({{ cart_count }})</a>

@@ -33,18 +33,7 @@
         <input type="hidden" name="order_ids" value="{{ row.order.id }}">
         {% endfor %}
 
-        <label style="font-size: 13px; color: var(--cafe-wood-mid); display:block; margin-bottom:8px;">Metode pembayaran</label>
-        <div style="display:flex; gap:8px; margin-bottom:16px;">
-            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
-                <input type="radio" name="method" value="tunai" checked style="margin-right:4px;">Tunai
-            </label>
-            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
-                <input type="radio" name="method" value="qris" style="margin-right:4px;">QRIS
-            </label>
-            <label style="flex:1; text-align:center; border:1px solid #D8C4A8; border-radius:8px; padding:10px; cursor:pointer;">
-                <input type="radio" name="method" value="debit" style="margin-right:4px;">Debit
-            </label>
-        </div>
+        {% with jumlah_bayar = grand_total %}{% include 'kasir/_metode_bayar.html' %}{% endwith %}
 
         <button type="submit" class="btn-primary">Konfirmasi pembayaran</button>
     </form>

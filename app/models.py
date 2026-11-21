@@ -89,6 +89,7 @@ class Payment(db.Model):
     cashier_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     method = db.Column(db.Enum('tunai', 'qris', 'debit'), nullable=False)
     total_amount = db.Column(db.Numeric(10, 2), nullable=False)
+    amount_paid = db.Column(db.Numeric(10, 2), nullable=True)
     paid_at = db.Column(db.DateTime, default=datetime.now)
 
     linked_orders = db.relationship('PaymentOrder', backref='payment', lazy=True)
