@@ -1,0 +1,12 @@
+<div class="categories" style="margin-bottom:12px;">
+    <a href="{{ url_for('admin.dashboard') }}" class="category-pill" style="text-decoration:none;">Dashboard</a>
+    <a href="{{ url_for('admin.produk') }}" class="category-pill" style="text-decoration:none;">Produk</a>
+    <a href="{{ url_for('admin.kategori') }}" class="category-pill" style="text-decoration:none;">Kategori</a>
+    <a href="{{ url_for('auth.logout') }}" class="category-pill" style="text-decoration:none;">Logout</a>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <p style="color: var(--cafe-terracotta); text-align:center; font-size:13px; margin-bottom:12px;">{{ message }}</p>
+    {% endfor %}
+{% endwith %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Dashboard admin</h1>
+    <p>{{ today.strftime('%d %B %Y') }}</p>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'admin/_nav.html' %}
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="menu-item" style="display:block; margin:0;">
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">Omset hari ini</div>
+            <div style="font-size:20px; font-weight:500;">Rp{{ "{:,.0f}".format(omset) }}</div>
+        </div>
+        <div class="menu-item" style="display:block; margin:0;">
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">Transaksi hari ini</div>
+            <div style="font-size:20px; font-weight:500;">{{ jumlah_transaksi }}</div>
+        </div>
+        <div class="menu-item" style="display:block; margin:0;">
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">Open bill aktif</div>
+            <div style="font-size:20px; font-weight:500;">{{ open_bill }}</div>
+        </div>
+        <div class="menu-item" style="display:block; margin:0;">
+            <div style="font-size:12px; color: var(--cafe-wood-mid);">Produk aktif</div>
+            <div style="font-size:20px; font-weight:500;">{{ produk_aktif }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

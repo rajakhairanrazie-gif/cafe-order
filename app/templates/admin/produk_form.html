@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit produk' if product else 'Tambah produk' }}{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>{{ 'Edit produk' if product else 'Tambah produk' }}</h1>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'admin/_nav.html' %}
+
+    <form method="POST">
+        <div style="margin-bottom:12px;">
+            <label style="font-size:13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Nama produk</label>
+            <input type="text" name="name" value="{{ product.name if product else '' }}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <label style="font-size:13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Kategori</label>
+            <select name="category_id" style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+                {% for c in categories %}
+                <option value="{{ c.id }}" {{ 'selected' if product and product.category_id == c.id else '' }}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <label style="display:block; margin-bottom:8px; font-size:14px;">
+            <input type="checkbox" name="is_taxable" {{ 'checked' if (product is none or product.is_taxable) else '' }}>
+            Kena pajak (tampil di menu customer dan laporan pajak)
+        </label>
+        <label style="display:block; margin-bottom:16px; font-size:14px;">
+            <input type="checkbox" name="is_active" {{ 'checked' if (product is none or product.is_active) else '' }}>
+            Aktif
+        </label>
+
+        {% if not product %}
+        <div style="background: var(--cafe-card); border-radius:12px; padding:12px; margin-bottom:16px;">
+            <div style="font-size:13px; color: var(--cafe-wood-mid); margin-bottom:8px;">Varian pertama</div>
+            <div style="display:flex; gap:8px;">
+                <input type="text" name="variant_name" placeholder="Contoh: Panas" style="flex:1; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+                <input type="number" name="price" placeholder="Harga" min="0" step="500" required style="flex:1; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            </div>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="btn-primary">Simpan</button>
+    </form>
+
+    {% if product %}
+    <h3 style="margin-top:24px; margin-bottom:10px;">Varian</h3>
+
+    {% for variant in product.variants %}
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+        <form method="POST" action="{{ url_for('admin.varian_ubah', variant_id=variant.id) }}" style="display:flex; gap:8px; flex:1;">
+            <input type="text" name="variant_name" value="{{ variant.variant_name }}" required style="flex:1; padding:8px; border-radius:8px; border:1px solid #D8C4A8;">
+            <input type="number" name="price" value="{{ variant.price|int }}" min="0" step="500" required style="width:110px; padding:8px; border-radius:8px; border:1px solid #D8C4A8;">
+            <button type="submit" style="padding:8px 12px; border-radius:8px; border:1px solid var(--cafe-wood-mid); background:transparent; color: var(--cafe-wood-mid); cursor:pointer;">Simpan</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.varian_hapus', variant_id=variant.id) }}" onsubmit="return confirm('Hapus varian ini?');">
+            <button type="submit" style="border:none; background:none; color: var(--cafe-terracotta); cursor:pointer;">Hapus</button>
+        </form>
+    </div>
+    {% endfor %}
+
+    <form method="POST" action="{{ url_for('admin.varian_tambah', product_id=product.id) }}" style="background: var(--cafe-card); border-radius:12px; padding:12px; margin-top:12px;">
+        <div style="font-size:13px; color: var(--cafe-wood-mid); margin-bottom:8px;">Tambah varian baru</div>
+        <div style="display:flex; gap:8px;">
+            <input type="text" name="variant_name" placeholder="Contoh: Dingin / Double" required style="flex:1; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <input type="number" name="price" placeholder="Harga" min="0" step="500" required style="width:110px; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <button type="submit" class="btn-primary" style="width:auto; margin-top:0; padding:10px 16px;">Tambah</button>
+        </div>
+    </form>
+    {% endif %}
+
+    <a href="{{ url_for('admin.produk') }}" style="display:block; text-align:center; margin-top:16px; color: var(--cafe-wood-mid); font-size:13px;">Kembali ke daftar produk</a>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Produk{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Kelola produk</h1>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'admin/_nav.html' %}
+
+    <a href="{{ url_for('admin.produk_tambah') }}" class="btn-primary" style="text-decoration:none; display:block; text-align:center; margin-bottom:16px;">+ Tambah produk</a>
+
+    {% for product in products %}
+    <a href="{{ url_for('admin.produk_edit', product_id=product.id) }}" style="text-decoration:none; color:inherit;">
+        <div class="menu-item">
+            <div class="menu-item-info">
+                <div class="menu-item-name">{{ product.name }}</div>
+                <div style="font-size:12px; color: var(--cafe-wood-mid);">
+                    {{ product.category.name }} · {{ product.variants|length }} varian · {{ 'Kena pajak' if product.is_taxable else 'Non-pajak' }}
+                </div>
+            </div>
+            <div style="font-size:12px; color: {{ 'var(--cafe-wood-mid)' if product.is_active else 'var(--cafe-terracotta)' }};">
+                {{ 'Aktif' if product.is_active else 'Nonaktif' }}
+            </div>
+        </div>
+    </a>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center;">Belum ada produk.</p>
+    {% endfor %}
+</div>
+{% endblock %}
