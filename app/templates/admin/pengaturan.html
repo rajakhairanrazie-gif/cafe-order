@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Pengaturan Nota{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Pengaturan nota</h1>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'admin/_nav.html' %}
+
+    <form method="POST">
+        <div style="margin-bottom:12px;">
+            <label style="font-size:13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Nama cafe</label>
+            <input type="text" name="cafe_name" value="{{ s.cafe_name }}" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <label style="font-size:13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Alamat</label>
+            <input type="text" name="cafe_address" value="{{ s.cafe_address }}" style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <label style="font-size:13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">No. telepon</label>
+            <input type="text" name="cafe_phone" value="{{ s.cafe_phone }}" style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+        </div>
+
+        <div style="margin-bottom:16px;">
+            <label style="font-size:13px; color: var(--cafe-wood-mid); display:block; margin-bottom:6px;">Pesan footer nota</label>
+            <textarea name="footer_text" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #D8C4A8; font-family:inherit;">{{ s.footer_text }}</textarea>
+            <div style="font-size:12px; color: var(--cafe-wood-mid); margin-top:4px;">
+                Bisa lebih dari satu baris. Contoh: WiFi: NamaWifi | Pass: 12345, lalu baris baru untuk ucapan terima kasih. Ganti kapan saja, nota berikutnya langsung memakai isi terbaru.
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Simpan pengaturan</button>
+    </form>
+</div>
+{% endblock %}

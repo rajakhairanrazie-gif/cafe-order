@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from app.models import Category, Product, ProductVariant, OrderItem, VariantIngredient, Payment, Order, Ingredient, Notification, User
 from app import db
+from app.pengaturan import DEFAULT_NOTA, get_settings, set_setting
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -348,3 +349,18 @@ def akun_password(user_id):
         db.session.commit()
         flash('Password diubah')
     return redirect(url_for('admin.akun'))
+
+# ---------- Pengaturan nota ----------
+
+@admin.route('/pengaturan', methods=['GET', 'POST'])
+@login_required
+@admin_only
+def pengaturan():
+    if request.method == 'POST':
+        for key in DEFAULT_NOTA:
+            set_setting(key, request.form.get(key, '').strip())
+        db.session.commit()
+        flash('Pengaturan nota disimpan')
+        return redirect(url_for('admin.pengaturan'))
+
+    return render_template('admin/pengaturan.html', s=get_settings())

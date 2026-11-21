@@ -34,6 +34,8 @@
         {% endif %}
     </div>
 
+    <a href="{{ url_for('kasir.nota', payment_id=payment.id) }}" target="_blank" class="btn-primary" style="text-decoration:none; display:block; margin-bottom:10px; background: var(--cafe-wood-mid);">Cetak nota</a>
+   
     <a href="{{ url_for('kasir.dashboard') }}" class="btn-primary" style="text-decoration:none; display:block;">Kembali ke dashboard</a>
 </div>
 {% endblock %}

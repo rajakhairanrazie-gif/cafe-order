@@ -1,11 +1,17 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, abort
 from flask_login import login_required, current_user
-from app.models import Order, OrderItem, Payment, PaymentOrder, Product
+from app.models import Order, OrderItem, Payment, PaymentOrder, Product, User
+from app.stok import kurangi_stok
+from app.pengaturan import get_settings
 from app import db
 from datetime import datetime
-from app.stok import kurangi_stok
 
 kasir = Blueprint('kasir', __name__, url_prefix='/kasir')
+
+@kasir.before_request
+def batasi_role():
+    if current_user.is_authenticated and current_user.role not in ('kasir', 'admin'):
+        abort(403)
 
 
 @kasir.route('/dashboard')
@@ -265,3 +271,29 @@ def closing():
     grand_count = sum(r['jumlah'] for r in rekap.values())
 
     return render_template('kasir/closing.html', rekap=rekap, grand_total=grand_total, grand_count=grand_count, today=today)
+
+@kasir.route('/nota/<int:payment_id>')
+@login_required
+def nota(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+    orders = [lo.order for lo in payment.linked_orders]
+
+    items = []
+    for order in orders:
+        for item in order.items:
+            harga = float(item.price_at_order)
+            items.append({
+                'nama': f'{item.variant.product.name} {item.variant.variant_name}',
+                'qty': item.quantity,
+                'harga': harga,
+                'subtotal': harga * item.quantity,
+            })
+
+    return render_template(
+        'kasir/nota.html',
+        payment=payment,
+        orders=orders,
+        items=items,
+        s=get_settings(),
+        kasir_user=User.query.get(payment.cashier_id),
+    )

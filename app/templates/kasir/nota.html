@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota {% for o in orders %}#{{ o.daily_number }}{% if not loop.last %}+{% endif %}{% endfor %}</title>
+    <style>
+        :root { --lebar-nota: 72mm; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; font-size: 12px; color: #000; background: #eee; margin: 0; padding: 16px; }
+        .nota { width: var(--lebar-nota); background: #fff; margin: 0 auto; padding: 8px; }
+        .tengah { text-align: center; }
+        .tebal { font-weight: bold; }
+        .garis { border-top: 1px dashed #000; margin: 6px 0; }
+        .baris { display: flex; justify-content: space-between; gap: 8px; }
+        .item-nama { word-break: break-word; }
+        .footer { white-space: pre-line; text-align: center; margin-top: 8px; }
+        .aksi { width: var(--lebar-nota); margin: 12px auto 0; display: flex; gap: 8px; }
+        .aksi button, .aksi a { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #6B4226; background: #6B4226; color: #fff; text-align: center; text-decoration: none; font-family: sans-serif; font-size: 14px; cursor: pointer; }
+        .aksi a { background: #fff; color: #6B4226; }
+
+        @media print {
+            @page { size: auto; margin: 0; }
+            body { background: #fff; padding: 0; }
+            .nota { margin: 0; }
+            .aksi { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="nota">
+        <div class="tengah">
+            <div class="tebal" style="font-size:14px;">{{ s.cafe_name }}</div>
+            {% if s.cafe_address %}<div>{{ s.cafe_address }}</div>{% endif %}
+            {% if s.cafe_phone %}<div>{{ s.cafe_phone }}</div>{% endif %}
+        </div>
+
+        <div class="garis"></div>
+
+        <div class="baris"><span>No. Order</span><span>{% for o in orders %}#{{ o.daily_number }}{% if not loop.last %}, {% endif %}{% endfor %}</span></div>
+        <div class="baris"><span>Tanggal</span><span>{{ payment.paid_at.strftime('%d/%m/%Y %H:%M') }}</span></div>
+        <div class="baris"><span>Kasir</span><span>{{ kasir_user.name if kasir_user else '-' }}</span></div>
+
+        <div class="garis"></div>
+
+        {% for it in items %}
+        <div class="item-nama">{{ it.nama }}</div>
+        <div class="baris">
+            <span>{{ it.qty }} x {{ "{:,.0f}".format(it.harga) }}</span>
+            <span>{{ "{:,.0f}".format(it.subtotal) }}</span>
+        </div>
+        {% endfor %}
+
+        <div class="garis"></div>
+
+        <div class="baris tebal"><span>Total</span><span>Rp{{ "{:,.0f}".format(payment.total_amount) }}</span></div>
+        <div class="baris"><span>Bayar ({{ payment.method|capitalize }})</span><span>Rp{{ "{:,.0f}".format(payment.amount_paid if payment.amount_paid else payment.total_amount) }}</span></div>
+        {% if payment.method == 'tunai' and payment.amount_paid %}
+        <div class="baris"><span>Kembalian</span><span>Rp{{ "{:,.0f}".format(payment.amount_paid - payment.total_amount) }}</span></div>
+        {% endif %}
+
+        <div class="garis"></div>
+
+        <div class="footer">{{ s.footer_text }}</div>
+    </div>
+
+    <div class="aksi">
+        <button type="button" onclick="window.print()">Cetak nota</button>
+        <a href="{{ url_for('kasir.dashboard') }}">Dashboard</a>
+    </div>
+</body>
+</html>
