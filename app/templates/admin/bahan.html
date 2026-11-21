@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Bahan Baku{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Bahan baku</h1>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'admin/_nav.html' %}
+
+    <form method="POST" style="background: var(--cafe-card); border-radius:12px; padding:12px; margin-bottom:16px;">
+        <div style="font-size:13px; color: var(--cafe-wood-mid); margin-bottom:8px;">Tambah bahan baru</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input type="text" name="name" placeholder="Nama (contoh: Susu)" required style="flex:2; min-width:140px; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <select name="unit" style="padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+                <option value="ml">ml</option>
+                <option value="pcs">pcs</option>
+                <option value="g">g</option>
+            </select>
+            <input type="number" name="quantity" placeholder="Stok awal" min="0" step="any" style="flex:1; min-width:90px; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <input type="number" name="threshold" placeholder="Batas notif" min="0" step="any" style="flex:1; min-width:90px; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <button type="submit" class="btn-primary" style="width:auto; margin-top:0; padding:10px 16px;">Tambah</button>
+        </div>
+    </form>
+
+    {% for b in ingredients %}
+    {% set kritis = b.quantity <= b.threshold %}
+    <div class="menu-item" style="display:block; {{ 'border:1px solid var(--cafe-terracotta);' if kritis else '' }}">
+        <form method="POST" action="{{ url_for('admin.bahan_ubah', ingredient_id=b.id) }}" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <input type="text" name="name" value="{{ b.name }}" required style="flex:2; min-width:120px; padding:8px; border-radius:8px; border:1px solid #D8C4A8;">
+            <input type="number" name="quantity" value="{{ '%g'|format(b.quantity) }}" min="0" step="any" style="width:90px; padding:8px; border-radius:8px; border:1px solid #D8C4A8;" title="Stok sekarang">
+            <span style="font-size:13px;">{{ b.unit }}</span>
+            <input type="number" name="threshold" value="{{ '%g'|format(b.threshold) }}" min="0" step="any" style="width:90px; padding:8px; border-radius:8px; border:1px solid #D8C4A8;" title="Batas notifikasi">
+            <button type="submit" style="padding:8px 12px; border-radius:8px; border:1px solid var(--cafe-wood-mid); background:transparent; color: var(--cafe-wood-mid); cursor:pointer;">Simpan</button>
+        </form>
+
+        <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+            <form method="POST" action="{{ url_for('admin.bahan_isi', ingredient_id=b.id) }}" style="display:flex; gap:6px; align-items:center;">
+                <input type="number" name="jumlah" placeholder="Isi ulang" min="0" step="any" required style="width:100px; padding:6px; border-radius:8px; border:1px solid #D8C4A8;">
+                <button type="submit" style="padding:6px 10px; border-radius:8px; border:none; background: var(--cafe-wood-dark); color: var(--cafe-bg); cursor:pointer;">+ Tambah stok</button>
+            </form>
+            {% if kritis %}<span style="font-size:12px; color: var(--cafe-terracotta);">Stok menipis</span>{% endif %}
+            <form method="POST" action="{{ url_for('admin.bahan_hapus', ingredient_id=b.id) }}" onsubmit="return confirm('Hapus bahan ini?');" style="margin-left:auto;">
+                <button type="submit" style="border:none; background:none; color: var(--cafe-terracotta); cursor:pointer; font-size:13px;">Hapus</button>
+            </form>
+        </div>
+        <div style="font-size:11px; color: var(--cafe-wood-mid); margin-top:6px;">Kolom pertama angka = stok sekarang, kolom kedua = batas notifikasi</div>
+    </div>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center;">Belum ada bahan baku.</p>
+    {% endfor %}
+</div>
+{% endblock %}

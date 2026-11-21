@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Resep{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Resep</h1>
+    <p>{{ variant.product.name }} - {{ variant.variant_name }}</p>
+</div>
+
+<div class="container" style="max-width:720px;">
+    {% include 'admin/_nav.html' %}
+
+    <p style="font-size:13px; color: var(--cafe-wood-mid); margin-bottom:12px;">Bahan yang terpakai untuk 1 porsi varian ini.</p>
+
+    {% for r in variant.ingredients %}
+    <div class="menu-item">
+        <div class="menu-item-info">
+            <div class="menu-item-name">{{ r.ingredient.name }}</div>
+            <div class="menu-item-price">{{ '%g'|format(r.amount_used) }} {{ r.ingredient.unit }}</div>
+        </div>
+        <form method="POST" action="{{ url_for('admin.resep_hapus', resep_id=r.id) }}">
+            <button type="submit" style="border:none; background:none; color: var(--cafe-terracotta); cursor:pointer; font-size:13px;">Hapus</button>
+        </form>
+    </div>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center; margin-bottom:12px;">Belum ada resep, stok tidak akan berkurang untuk varian ini.</p>
+    {% endfor %}
+
+    {% if ingredients %}
+    <form method="POST" style="background: var(--cafe-card); border-radius:12px; padding:12px; margin-top:12px;">
+        <div style="font-size:13px; color: var(--cafe-wood-mid); margin-bottom:8px;">Tambah bahan ke resep</div>
+        <div style="display:flex; gap:8px;">
+            <select name="ingredient_id" style="flex:2; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+                {% for b in ingredients %}
+                <option value="{{ b.id }}">{{ b.name }} ({{ b.unit }})</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="amount_used" placeholder="Jumlah" min="0" step="any" required style="flex:1; padding:10px; border-radius:8px; border:1px solid #D8C4A8;">
+            <button type="submit" class="btn-primary" style="width:auto; margin-top:0; padding:10px 16px;">Simpan</button>
+        </div>
+    </form>
+    {% else %}
+        <p style="text-align:center;"><a href="{{ url_for('admin.bahan') }}">Tambah bahan baku dulu</a></p>
+    {% endif %}
+
+    <a href="{{ url_for('admin.produk_edit', product_id=variant.product_id) }}" style="display:block; text-align:center; margin-top:16px; color: var(--cafe-wood-mid); font-size:13px;">Kembali ke produk</a>
+</div>
+{% endblock %}

@@ -30,4 +30,15 @@
         </div>
     </div>
 </div>
+    {% if stok_kritis %}
+    <h3 style="margin:20px 0 10px;">Stok menipis</h3>
+    {% for b in stok_kritis %}
+    <div class="menu-item" style="border:1px solid var(--cafe-terracotta);">
+        <div class="menu-item-info">
+            <div class="menu-item-name">{{ b.name }}</div>
+            <div style="font-size:12px; color: var(--cafe-terracotta);">Sisa {{ '%g'|format(b.quantity) }} {{ b.unit }} (batas {{ '%g'|format(b.threshold) }})</div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 {% endblock %}

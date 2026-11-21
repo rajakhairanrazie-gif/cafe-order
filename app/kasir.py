@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from app.models import Order, OrderItem, Payment, PaymentOrder, Product
 from app import db
 from datetime import datetime
+from app.stok import kurangi_stok
 
 kasir = Blueprint('kasir', __name__, url_prefix='/kasir')
 
@@ -147,6 +148,7 @@ def offline_simpan(aksi):
         item = OrderItem(order_id=order.id, variant_id=variant.id, quantity=entry['quantity'], price_at_order=variant.price)
         db.session.add(item)
 
+    kurangi_stok(order)
     db.session.commit()
     session.pop('kasir_cart', None)
 

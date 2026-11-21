@@ -2,7 +2,7 @@ from functools import wraps
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash, abort
 from flask_login import login_required, current_user
-from app.models import Category, Product, ProductVariant, OrderItem, VariantIngredient, Payment, Order
+from app.models import Category, Product, ProductVariant, OrderItem, VariantIngredient, Payment, Order, Ingredient
 from app import db
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
@@ -35,6 +35,7 @@ def dashboard():
         jumlah_transaksi=len(payments),
         open_bill=Order.query.filter_by(status='open').count(),
         produk_aktif=Product.query.filter_by(is_active=True).count(),
+        stok_kritis=Ingredient.query.filter(Ingredient.quantity <= Ingredient.threshold).all(),
     )
 
 
@@ -187,3 +188,105 @@ def varian_hapus(variant_id):
         flash('Varian dihapus')
 
     return redirect(url_for('admin.produk_edit', product_id=product_id))
+
+# ---------- Bahan baku ----------
+
+@admin.route('/bahan', methods=['GET', 'POST'])
+@login_required
+@admin_only
+def bahan():
+    if request.method == 'POST':
+        name = request.form['name'].strip()
+        if name:
+            db.session.add(Ingredient(
+                name=name,
+                unit=request.form['unit'],
+                quantity=request.form['quantity'] or 0,
+                threshold=request.form['threshold'] or 0,
+            ))
+            db.session.commit()
+            flash('Bahan baku ditambahkan')
+        return redirect(url_for('admin.bahan'))
+
+    ingredients = Ingredient.query.order_by(Ingredient.name).all()
+    return render_template('admin/bahan.html', ingredients=ingredients)
+
+
+@admin.route('/bahan/<int:ingredient_id>/ubah', methods=['POST'])
+@login_required
+@admin_only
+def bahan_ubah(ingredient_id):
+    bahan = Ingredient.query.get_or_404(ingredient_id)
+    bahan.name = request.form['name'].strip()
+    bahan.quantity = request.form['quantity'] or 0
+    bahan.threshold = request.form['threshold'] or 0
+    db.session.commit()
+    flash('Bahan disimpan')
+    return redirect(url_for('admin.bahan'))
+
+
+@admin.route('/bahan/<int:ingredient_id>/isi', methods=['POST'])
+@login_required
+@admin_only
+def bahan_isi(ingredient_id):
+    bahan = Ingredient.query.get_or_404(ingredient_id)
+    try:
+        tambahan = float(request.form['jumlah'])
+    except ValueError:
+        tambahan = 0
+    if tambahan > 0:
+        bahan.quantity = float(bahan.quantity) + tambahan
+        db.session.commit()
+        flash(f'Stok {bahan.name} ditambah {tambahan:g} {bahan.unit}')
+    return redirect(url_for('admin.bahan'))
+
+
+@admin.route('/bahan/<int:ingredient_id>/hapus', methods=['POST'])
+@login_required
+@admin_only
+def bahan_hapus(ingredient_id):
+    bahan = Ingredient.query.get_or_404(ingredient_id)
+    if VariantIngredient.query.filter_by(ingredient_id=bahan.id).first():
+        flash('Bahan masih dipakai di resep, hapus dari resep dulu')
+    else:
+        Notification.query.filter_by(ingredient_id=bahan.id).delete()
+        db.session.delete(bahan)
+        db.session.commit()
+        flash('Bahan dihapus')
+    return redirect(url_for('admin.bahan'))
+
+
+# ---------- Resep ----------
+
+@admin.route('/varian/<int:variant_id>/resep', methods=['GET', 'POST'])
+@login_required
+@admin_only
+def resep(variant_id):
+    variant = ProductVariant.query.get_or_404(variant_id)
+
+    if request.method == 'POST':
+        ingredient_id = int(request.form['ingredient_id'])
+        amount = request.form['amount_used']
+        if amount and float(amount) > 0:
+            ada = VariantIngredient.query.filter_by(variant_id=variant.id, ingredient_id=ingredient_id).first()
+            if ada:
+                ada.amount_used = amount
+            else:
+                db.session.add(VariantIngredient(variant_id=variant.id, ingredient_id=ingredient_id, amount_used=amount))
+            db.session.commit()
+            flash('Resep disimpan')
+        return redirect(url_for('admin.resep', variant_id=variant.id))
+
+    ingredients = Ingredient.query.order_by(Ingredient.name).all()
+    return render_template('admin/resep.html', variant=variant, ingredients=ingredients)
+
+
+@admin.route('/resep/<int:resep_id>/hapus', methods=['POST'])
+@login_required
+@admin_only
+def resep_hapus(resep_id):
+    item = VariantIngredient.query.get_or_404(resep_id)
+    variant_id = item.variant_id
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for('admin.resep', variant_id=variant_id))

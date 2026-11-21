@@ -57,6 +57,7 @@
             <input type="number" name="price" value="{{ variant.price|int }}" min="0" step="500" required style="width:110px; padding:8px; border-radius:8px; border:1px solid #D8C4A8;">
             <button type="submit" style="padding:8px 12px; border-radius:8px; border:1px solid var(--cafe-wood-mid); background:transparent; color: var(--cafe-wood-mid); cursor:pointer;">Simpan</button>
         </form>
+        <a href="{{ url_for('admin.resep', variant_id=variant.id) }}" style="font-size:13px; color: var(--cafe-wood-mid);">Resep</a>
         <form method="POST" action="{{ url_for('admin.varian_hapus', variant_id=variant.id) }}" onsubmit="return confirm('Hapus varian ini?');">
             <button type="submit" style="border:none; background:none; color: var(--cafe-terracotta); cursor:pointer;">Hapus</button>
         </form>

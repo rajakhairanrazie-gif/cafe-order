@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, sessio
 from app.models import Product, Category, ProductVariant, Order, OrderItem
 from app import db
 from datetime import date
+from app.stok import kurangi_stok
 
 main = Blueprint('main', __name__)
 
@@ -76,7 +77,8 @@ def checkout():
             price_at_order=variant.price
         )
         db.session.add(item)
-
+    
+    kurangi_stok(order)
     db.session.commit()
     session.pop('cart', None)
 
