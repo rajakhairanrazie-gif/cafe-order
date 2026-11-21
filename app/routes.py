@@ -9,10 +9,17 @@ main = Blueprint('main', __name__)
 
 @main.route('/menu')
 def menu():
-    products = Product.query.filter_by(is_active=True, is_taxable=True).all()
+    kategori_id = request.args.get('kategori', type=int)
+
+    query = Product.query.filter_by(is_active=True, is_taxable=True)
+    if kategori_id:
+        query = query.filter_by(category_id=kategori_id)
+
+    products = query.all()
     categories = Category.query.all()
     cart_count = len(session.get('cart', []))
-    return render_template('menu.html', products=products, categories=categories, cart_count=cart_count)
+    return render_template('menu.html', products=products, categories=categories,
+                           cart_count=cart_count, kategori_id=kategori_id)
 
 
 @main.route('/produk/<int:product_id>')

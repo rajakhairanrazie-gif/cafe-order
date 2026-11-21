@@ -10,13 +10,13 @@
 
 <div class="container">
     <div class="categories">
-        <div class="category-pill active">Semua</div>
+        <a href="{{ url_for('main.menu') }}" class="category-pill {{ 'active' if not kategori_id }}" style="text-decoration:none;">Semua</a>
         {% for category in categories %}
-        <div class="category-pill">{{ category.name }}</div>
+        <a href="{{ url_for('main.menu', kategori=category.id) }}" class="category-pill {{ 'active' if kategori_id == category.id }}" style="text-decoration:none;">{{ category.name }}</a>
         {% endfor %}
     </div>
 
-    {% for product in products %}
+        {% for product in products %}
     <div class="menu-item">
         <div class="menu-item-img">☕</div>
         <div class="menu-item-info">
@@ -25,6 +25,8 @@
         </div>
         <a href="{{ url_for('main.detail_produk', product_id=product.id) }}" class="menu-item-add" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">+</a>
     </div>
+    {% else %}
+        <p style="color: var(--cafe-wood-mid); text-align:center; margin:24px 0;">Belum ada menu di kategori ini.</p>
     {% endfor %}
 
     <a href="{{ url_for('main.keranjang') }}" class="btn-primary" style="text-decoration:none; display:block;">Lihat keranjang ({{ cart_count }})</a>
