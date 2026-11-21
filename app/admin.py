@@ -2,7 +2,8 @@ from functools import wraps
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash, abort
 from flask_login import login_required, current_user
-from app.models import Category, Product, ProductVariant, OrderItem, VariantIngredient, Payment, Order, Ingredient
+from werkzeug.security import generate_password_hash
+from app.models import Category, Product, ProductVariant, OrderItem, VariantIngredient, Payment, Order, Ingredient, Notification, User
 from app import db
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
